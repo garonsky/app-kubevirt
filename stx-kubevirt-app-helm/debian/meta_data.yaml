@@ -1,0 +1,14 @@
+# Copyright (c) 2022 Wind River Systems, Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+debname: stx-kubevirt-app-helm
+debver: 1.0-1
+src_path: stx-kubevirt-app-helm
+revision:
+  dist: $STX_DIST
+  PKG_GITREVCOUNT: true
+behavior:
+  platform_managed_app: yes
+  desired_state: uploaded

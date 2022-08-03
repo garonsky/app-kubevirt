@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+# export DH_VERBOSE = 1
+
+export APP_NAME=kubevirt-app
+export PBR_VERSION=1.0.0
+export PYBUILD_NAME=k8sapp-kubevirt
+export ROOT=$(CURDIR)/debian/tmp
+export SKIP_PIP_INSTALL=1
+
+%:
+	dh $@ --with=python3 --buildsystem=pybuild
+
+override_dh_auto_build:
+	python3 setup.py build
+
+override_dh_auto_install:
+	python3 setup.py install --install-layout=deb --skip-build --root $(ROOT)
+	python3 setup.py bdist_wheel \
+		--universal \
+		-d $(ROOT)/plugins/$(APP_NAME)

@@ -1,0 +1,11 @@
+This directory contains all StarlingX charts that need to be built for this
+application. The Helm Charts are derived from Kubernetes yaml files for KubeVirt.
+The original sources were retrieved from:
+
+https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-cr.yaml
+https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-operator.yaml.
+
+Additional information can be found at https://kubevirt.io/.
+
+As the KubeVirt versions are updated, maintainers of this repo will need to update
+the helm charts.

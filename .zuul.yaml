@@ -1,0 +1,33 @@
+---
+- project:
+    check:
+      jobs:
+        - openstack-tox-linters
+        - k8sapp-kubevirt-tox-py39
+        - k8sapp-kubevirt-tox-pylint
+    gate:
+      jobs:
+        - openstack-tox-linters
+        - k8sapp-kubevirt-tox-py39
+        - k8sapp-kubevirt-tox-pylint
+- job:
+    name: k8sapp-kubevirt-tox-py39
+    parent: tox-py39
+    description: |
+                Run py39 for KubeVirt app
+    nodeset: debian-bullseye
+    files:
+      - python-k8sapp-kubevirt/*
+    vars:
+        tox_envlist: py39
+        python_version: 3.9
+- job:
+    name: k8sapp-kubevirt-tox-pylint
+    parent: tox
+    description: |
+            Run pylint test for k8sapp_kubevirt
+    files:
+      - python-k8sapp-kubevirt/*
+    vars:
+      tox_envlist: pylint
+
