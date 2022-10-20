@@ -59,12 +59,12 @@ spec:
         - "2"
         env:
         - name: OPERATOR_IMAGE
-          value: {{ .Values.image }}
+          value: {{ .Values.images.tags.virtOperatorImage }}
         - name: WATCH_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.annotations['olm.targetNamespaces']
-        image: {{ .Values.image }}
+        image: {{ .Values.images.tags.virtOperatorImage }}
         imagePullPolicy: IfNotPresent
         name: virt-operator
         ports:
@@ -92,7 +92,7 @@ spec:
           name: profile-data
       initContainers:
         - name: virtctl-init-container
-          image: {{ .Values.virtctlImage }}
+          image: {{ .Values.images.tags.virtCtlImage }}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: controller-dir
