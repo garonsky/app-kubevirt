@@ -16,6 +16,7 @@ images:
     virtControllerImage: quay.io/kubevirt/virt-controller:v0.53.1
     virtLauncherImage: quay.io/kubevirt/virt-launcher:v0.53.1
     virtHandlerImage: quay.io/kubevirt/virt-handler:v0.53.1
+    virtApiImage: quay.io/kubevirt/virt-api:v0.53.1
     cdiOperatorImage: quay.io/kubevirt/cdi-operator:v1.54.0
     cdiControlerImage: quay.io/kubevirt/cdi-controller:v1.54.0
     cdiImporterImage: quay.io/kubevirt/cdi-importer:v1.54.0
