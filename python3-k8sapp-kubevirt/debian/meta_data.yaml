@@ -1,11 +1,7 @@
-# Copyright (c) 2022 Wind River Systems, Inc.
-#
-# SPDX-License-Identifier: Apache-2.0
-#
 ---
-debname: stx-kubevirt-app-helm
+debname: python3-k8sapp-kubevirt
 debver: 1.0-1
-src_path: stx-kubevirt-app-helm
+src_path: k8sapp_kubevirt
 revision:
   dist: $STX_DIST
   GITREVCOUNT:

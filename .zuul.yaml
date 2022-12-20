@@ -17,7 +17,7 @@
                 Run py39 for KubeVirt app
     nodeset: debian-bullseye
     files:
-      - python-k8sapp-kubevirt/*
+      - python3-k8sapp-kubevirt/*
     vars:
         tox_envlist: py39
         python_version: 3.9
@@ -27,7 +27,7 @@
     description: |
             Run pylint test for k8sapp_kubevirt
     files:
-      - python-k8sapp-kubevirt/*
+      - python3-k8sapp-kubevirt/*
     vars:
       tox_envlist: pylint
 
