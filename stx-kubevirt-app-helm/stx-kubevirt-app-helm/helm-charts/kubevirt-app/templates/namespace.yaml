@@ -11,7 +11,7 @@
 # limitations under the License.
 
 #
-# Copyright (c) 202 Wind River Systems, Inc.
+# Copyright (c) 2023 Wind River Systems, Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -21,10 +21,7 @@ kind: Namespace
 metadata:
   labels:
     kubevirt.io: ""
-    app.kubernetes.io/managed-by: Helm
+    pod-security.kubernetes.io/enforce: "privileged"
+    app.starlingx.io/component: {{ .Values.kubevirt.componentType }}
   annotations:
-    meta.helm.sh/release-name: kubevirt-app
-    meta.helm.sh/release-namespace: kubevirt
   name: kubevirt
-spec:
-  finalizers:

@@ -1,25 +1,42 @@
-#
-# Copyright (c) 2022 Wind River Systems, Inc.
+# Copyright (c) 2023 Wind River Systems, Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 # All Rights Reserved.
 #
+"""  Kubevirt application predefined constants """
 
-HELM_APP_KUBEVIRT = 'kubevirt'
+HELM_APP_KUBEVIRT = 'kubevirt-app'
 HELM_APP_KUBEVIRT_CR = 'kubevirt.kubevirt.io/kubevirt'
 HELM_APP_KUBEVIRT_CRD = 'kubevirts.kubevirt.io'
 HELM_RELEASE_KUBEVIRT = 'kubevirt'
 HELM_CHART_KUBEVIRT = 'kubevirt'
+HELM_CHART_CDI = 'cdi'
+HELM_CHART_COMPONENT_LABEL = 'app.starlingx.io/component'
+HELM_CHART_COMPONENT_APPLICATION = 'application'
+HELM_CHART_COMPONENT_PLATFORM = 'platform'
 HELM_NS_KUBEVIRT = 'kubevirt'
+HELM_RELEASE_NS = 'kube-system'
+HELM_RELEASE_TOOL_KIT_GROUP = 'helm.toolkit.fluxcd.io'
+HELM_RELEASE_TOOL_KIT_VERSION = 'v2beta1'
+HELM_RELEASE_TOOL_KIT_PLURAL = 'helmreleases'
 
 HELM_APP_CDI = 'cdi'
 HELM_APP_CDI_CR = 'cdi.cdi.kubevirt.io/cdi'
 HELM_APP_CDI_CRD = 'cdis.cdi.kubevirt.io'
 HELM_NS_CDI = 'cdi'
-HELM_APP_CDI_UPLOAD_API_V1_ALPHA_1 = 'v1alpha1.upload.cdi.kubevirt.io'
-HELM_APP_CDI_UPLOAD_API_V1_BETA_1 = 'v1beta1.upload.cdi.kubevirt.io'
 
 HELM_VIRTCTL_DIR = '/var/opt/kubevirt/'
-HELM_VIRTCTL_FILE_NAME = 'virtctl-v0.53.1-linux-amd64'
+HELM_VIRTCTL_FILE_NAME = 'virtctl-v0.59.0-linux-amd64'
+HELM_VIRTCTL_LINK_NAME = 'virtctl'
 HELM_VIRTCTL_PATH = HELM_VIRTCTL_DIR + HELM_VIRTCTL_FILE_NAME
+HELM_VIRTCTL_LINK_PATH = HELM_VIRTCTL_DIR + HELM_VIRTCTL_LINK_NAME
+
+CDI_CERTIFICATE_ROTATE_CA_DURATION = '720h'
+CDI_CERTIFICATE_ROTATE_CA_RENEW_BEFORE = '360h'
+CDI_CERTIFICATE_ROTATE_SERVER_DURATION = '720h'
+CDI_CERTIFICATE_ROTATE_SERVER_RENEW_BEFORE = '360h'
+KUBEVIRT_CERTIFICATE_ROTATE_CA_DURATION = '720h'
+KUBEVIRT_CERTIFICATE_ROTATE_CA_RENEW_BEFORE = '360h'
+KUBEVIRT_CERTIFICATE_ROTATE_SERVER_DURATION = '720h'
+KUBEVIRT_CERTIFICATE_ROTATE_SERVER_RENEW_BEFORE = '360h'

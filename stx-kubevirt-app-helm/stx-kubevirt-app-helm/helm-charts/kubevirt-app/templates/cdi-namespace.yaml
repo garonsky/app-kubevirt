@@ -11,7 +11,7 @@
 # limitations under the License.
 
 #
-# Copyright (c) 2022 Wind River Systems, Inc.
+# Copyright (c) 2023 Wind River Systems, Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -21,8 +21,6 @@ kind: Namespace
 metadata:
   labels:
     cdi.kubevirt.io: ""
-    app.kubernetes.io/managed-by: Helm
+    app.starlingx.io/component: {{ .Values.cdi.componentType }}
   name: cdi
   annotations:
-    meta.helm.sh/release-name: kubevirt-cdi-app
-    meta.helm.sh/release-namespace: cdi

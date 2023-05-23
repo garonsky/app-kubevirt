@@ -22,13 +22,22 @@ metadata:
   name: kubevirt
   namespace: kubevirt
 spec:
-  certificateRotateStrategy: {}
+  certificateRotateStrategy:
+    selfSigned:
+      ca:
+        duration: {{ .Values.kubevirt.certificateRotate.ca.duration }}
+        renewBefore: {{ .Values.kubevirt.certificateRotate.ca.renewBefore }}
+      server:
+        duration: {{ .Values.kubevirt.certificateRotate.server.duration }}
+        renewBefore: {{ .Values.kubevirt.certificateRotate.server.renewBefore }}
   configuration:
     developerConfiguration:
-      featureGates: {{ .Values.featureGates }}
-      useEmulation: {{ .Values.useEmulation }}
+      featureGates: {{ .Values.kubevirt.featureGates }}
+      useEmulation: {{ .Values.kubevirt.useEmulation }}
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
+  imagePullSecrets:
+    - name: {{ .Values.kubevirt.imagePullSecrets }}
   infra:
-    replicas: {{ .Values.replicas }}
+    replicas: {{ .Values.kubevirt.replicas }}
   workloadUpdateStrategy: {}

@@ -21,15 +21,25 @@ kind: CDI
 metadata:
   name: cdi
 spec:
+  certConfig:
+    ca:
+      duration: {{ .Values.cdi.certificateRotate.ca.duration }}
+      renewBefore: {{ .Values.cdi.certificateRotate.ca.renewBefore }}
+    server:
+      duration: {{ .Values.cdi.certificateRotate.server.duration }}
+      renewBefore: {{ .Values.cdi.certificateRotate.server.renewBefore }}
+  config:
+    imagePullSecrets:
+    - name: {{ .Values.cdi.imagePullSecrets }}
+    featureGates: {{ .Values.cdi.featureGates }}
   imagePullPolicy: IfNotPresent
   infra:
-    nodeSelector:
-      kubernetes.io/os: linux
     tolerations:
     - key: CriticalAddonsOnly
       operator: Exists
   workload:
-{{- if .Values.nodeSelector }}
-      nodeSelector:
-{{ .Values.nodeSelector | toYaml | trim | indent 8 }}
-{{- end }}
+    {{- if .Values.cdi.nodeSelector }}
+    nodeSelector:
+      {{- .Values.cdi.nodeSelector | toYaml | trim | nindent 6 }}
+    {{- end }}
+

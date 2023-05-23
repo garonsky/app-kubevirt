@@ -1,33 +1,78 @@
 ---
 - project:
+    vars:
+      ensure_tox_version: '<4'
     check:
       jobs:
         - openstack-tox-linters
         - k8sapp-kubevirt-tox-py39
+        - k8sapp-kubevirt-tox-flake8
         - k8sapp-kubevirt-tox-pylint
     gate:
       jobs:
         - openstack-tox-linters
         - k8sapp-kubevirt-tox-py39
+        - k8sapp-kubevirt-tox-flake8
         - k8sapp-kubevirt-tox-pylint
+
 - job:
     name: k8sapp-kubevirt-tox-py39
     parent: tox-py39
     description: |
-                Run py39 for KubeVirt app
+      Run py39 for kubevirt app
+    nodeset: debian-bullseye
+    required-projects:
+      - starlingx/config
+      - starlingx/fault
+      - starlingx/root
+      - starlingx/update
+      - starlingx/utilities
+    files:
+      - python3-k8sapp-kubevirt/*
+    vars:
+      tox_envlist: py39
+      tox_extra_args: -c python3-k8sapp-kubevirt/k8sapp_kubevirt/tox.ini
+      tox_constraints_file: '{{ ansible_user_dir }}/src/opendev.org/starlingx/root/build-tools/requirements/debian/upper-constraints.txt'
+
+- job:
+    name: k8sapp-kubevirt-tox-flake8
+    parent: tox
+    description: |
+        Run flake8 for kubevirt
     nodeset: debian-bullseye
     files:
       - python3-k8sapp-kubevirt/*
     vars:
-        tox_envlist: py39
-        python_version: 3.9
+        tox_envlist: flake8
+        tox_extra_args: -c python3-k8sapp-kubevirt/k8sapp_kubevirt/tox.ini
+
 - job:
     name: k8sapp-kubevirt-tox-pylint
     parent: tox
     description: |
-            Run pylint test for k8sapp_kubevirt
+      Run pylint test for k8sapp_kubevirt
+    required-projects:
+      - starlingx/config
+      - starlingx/fault
+      - starlingx/root
+      - starlingx/update
+      - starlingx/utilities
+    nodeset: debian-bullseye
     files:
       - python3-k8sapp-kubevirt/*
     vars:
       tox_envlist: pylint
+      tox_extra_args: -c python3-k8sapp-kubevirt/k8sapp_kubevirt/tox.ini
+      tox_constraints_file: '{{ ansible_user_dir }}/src/opendev.org/starlingx/root/build-tools/requirements/debian/upper-constraints.txt'
 
+- job:
+    name: k8sapp-kubevirt-tox-bandit
+    parent: tox
+    description: |
+        Run bandit for kubevirt
+    nodeset: debian-bullseye
+    files:
+      - python3-k8sapp-kubevirt/*
+    vars:
+        tox_envlist: bandit
+        tox_extra_args: -c python3-k8sapp-kubevirt/k8sapp_kubevirt/tox.ini

@@ -11,7 +11,7 @@
 # limitations under the License.
 
 #
-# Copyright (c) 202 Wind River Systems, Inc.
+# Copyright (c) 2023 Wind River Systems, Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -24,7 +24,7 @@ metadata:
   name: virt-operator
   namespace: kubevirt
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.kubevirt.replicas }}
   selector:
     matchLabels:
       kubevirt.io: virt-operator
@@ -51,39 +51,49 @@ spec:
               topologyKey: kubernetes.io/hostname
             weight: 1
       containers:
-      - command:
-        - virt-operator
+      - args:
         - --port
         - "8443"
         - -v
         - "2"
+        command:
+        - virt-operator
         env:
-        - name: OPERATOR_IMAGE
-          value: {{ .Values.images.tags.virtOperatorImage }}
+        - name: VIRT_OPERATOR_IMAGE
+          value: {{ .Values.kubevirt.images.tags.virtOperatorImage }}
         - name: WATCH_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.annotations['olm.targetNamespaces']
-        image: {{ .Values.images.tags.virtOperatorImage }}
+        - name: KUBEVIRT_VERSION
+          value: {{ .Values.kubevirt.kubeVirtVersion }}
+        image: {{ .Values.kubevirt.images.tags.virtOperatorImage }}
         imagePullPolicy: IfNotPresent
         name: virt-operator
         ports:
-        - containerPort: {{ .Values.containerPorts.metricsPort }}
+        - containerPort: {{ .Values.kubevirt.containerPorts.metricsPort }}
           name: metrics
           protocol: TCP
-        - containerPort: {{ .Values.containerPorts.webhooksPort }}
+        - containerPort: {{ .Values.kubevirt.containerPorts.webhooksPort }}
           name: webhooks
           protocol: TCP
         readinessProbe:
           httpGet:
             path: /metrics
-            port: {{ .Values.containerPorts.readinessProbePort }}
+            port: {{ .Values.kubevirt.containerPorts.readinessProbePort }}
             scheme: HTTPS
           initialDelaySeconds: 5
           timeoutSeconds: 10
         resources:
           requests:
-            memory: {{ .Values.resources.requests.memory }}
+            memory: {{ .Values.kubevirt.resources.requests.memory }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
         volumeMounts:
         - mountPath: /etc/virt-operator/certificates
           name: kubevirt-operator-certs
@@ -92,23 +102,27 @@ spec:
           name: profile-data
       initContainers:
         - name: virtctl-init-container
-          image: {{ .Values.images.tags.virtCtlImage }}
+          image: {{ .Values.kubevirt.images.tags.virtCtlImage }}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: controller-dir
               mountPath: /var/opt/
-          command: ['sh', '-c', "mkdir -p /var/opt/kubevirt/; mv /virtctl-v* /var/opt/kubevirt; chmod 755 /var/opt/kubevirt;"]
+          command: ['sh', '-c', "mkdir -p /var/opt/kubevirt/; mv /virtctl-v* /var/opt/kubevirt; chmod 755 /var/opt/kubevirt; cp -s /var/opt/kubevirt/virtctl-v* /var/opt/kubevirt/virtctl"]
+      imagePullSecrets:
+        - name: {{ .Values.kubevirt.imagePullSecrets }}
       priorityClassName: kubevirt-cluster-critical
       securityContext:
         runAsNonRoot: false
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: kubevirt-operator
-{{- with .Values.tolerations }}
+{{- with .Values.kubevirt.tolerations }}
       tolerations:
 {{ toYaml . | indent 6 }}
 {{- end }}
-{{- if .Values.nodeSelector }}
+{{- if .Values.kubevirt.nodeSelector }}
       nodeSelector:
-{{ .Values.nodeSelector | toYaml | trim | indent 8 }}
+{{ .Values.kubevirt.nodeSelector | toYaml | trim | indent 8 }}
 {{- end }}
       volumes:
       - name: kubevirt-operator-certs

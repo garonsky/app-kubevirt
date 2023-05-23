@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Wind River Systems, Inc.
+# Copyright (c) 2023 Wind River Systems, Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -7,44 +7,87 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 ---
-replicas: 1
 
-images:
-  tags:
-    virtCtlImage: docker.io/starlingx/stx-kubevirt-app:stx.8.0-v0.53.1
-    virtOperatorImage: quay.io/kubevirt/virt-operator:v0.53.1
-    virtControllerImage: quay.io/kubevirt/virt-controller:v0.53.1
-    virtLauncherImage: quay.io/kubevirt/virt-launcher:v0.53.1
-    virtHandlerImage: quay.io/kubevirt/virt-handler:v0.53.1
-    virtApiImage: quay.io/kubevirt/virt-api:v0.53.1
-    cdiOperatorImage: quay.io/kubevirt/cdi-operator:v1.54.0
-    cdiControlerImage: quay.io/kubevirt/cdi-controller:v1.54.0
-    cdiImporterImage: quay.io/kubevirt/cdi-importer:v1.54.0
-    cdiClonerImage: quay.io/kubevirt/cdi-cloner:v1.54.0
-    cdiApiServerImage: quay.io/kubevirt/cdi-apiserver:v1.54.0
-    cdiUploadServerImage: quay.io/kubevirt/cdi-uploadserver:v1.54.0
-    cdiUploadProxyImage: quay.io/kubevirt/cdi-uploadproxy:v1.54.0
+# KubeVirt configuration
+kubevirt:
+  kubeVirtVersion: v0.59.0
+  replicas: 1
+  componentType: "platform"
+  certificateRotate:
+    ca:
+      duration: 720h
+      renewBefore: 360h
+    server:
+      duration: 720h
+      renewBefore: 360h
+  images:
+    tags:
+      virtCtlImage: docker.io/starlingx/stx-kubevirt-app:stx.8.0-v0.59.0
+      virtOperatorImage: quay.io/kubevirt/virt-operator:v0.59.0
+      virtControllerImage: quay.io/kubevirt/virt-controller:v0.59.0
+      virtLauncherImage: quay.io/kubevirt/virt-launcher:v0.59.0
+      virtHandlerImage: quay.io/kubevirt/virt-handler:v0.59.0
+      virtApiImage: quay.io/kubevirt/virt-api:v0.59.0
+  imagePullSecrets: default-registry-key
+  resources:
+    requests:
+      memory: 400Mi
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"
+  containerPorts:
+    metricsPort: 8443
+    webhooksPort: 8444
+    readinessProbePort: 8443
 
-imagePullSecrets: default-registry-key
-
-resources:
-   requests:
-     memory: 150Mi
-
-nodeSelector: { node-role.kubernetes.io/control-plane: "" }
-
-tolerations:
-  - key: "CriticalAddonsOnly"
-    operator: "Exists"
-  - key: "node-role.kubernetes.io/control-plane"
-    operator: "Exists"
-    effect: "NoSchedule"
-  - key: "node-role.kubernetes.io/master"
-    operator: "Exists"
-    effect: "NoSchedule"
-
-containerPorts:
-  metricsPort: 8443
-  webhooksPort: 8444
-  readinessProbePort: 8443
-  cdiMetricsPort: 8080
+# CDI (Containerized Data Importer) configuration
+cdi:
+  cdiVersion: v1.57.0
+  replicas: 1
+  componentType: "platform"
+  certificateRotate:
+    ca:
+      duration: 720h
+      renewBefore: 360h
+    server:
+      duration: 720h
+      renewBefore: 360h
+  featureGates:
+    - HonorWaitForFirstConsumer
+  images:
+    tags:
+      cdiOperatorImage: quay.io/kubevirt/cdi-operator:v1.57.0
+      cdiControlerImage: quay.io/kubevirt/cdi-controller:v1.57.0
+      cdiImporterImage: quay.io/kubevirt/cdi-importer:v1.57.0
+      cdiClonerImage: quay.io/kubevirt/cdi-cloner:v1.57.0
+      cdiApiServerImage: quay.io/kubevirt/cdi-apiserver:v1.57.0
+      cdiUploadServerImage: quay.io/kubevirt/cdi-uploadserver:v1.57.0
+      cdiUploadProxyImage: quay.io/kubevirt/cdi-uploadproxy:v1.57.0
+  imagePullSecrets: default-registry-key
+  resources:
+    requests:
+      memory: 400Mi
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+    kubernetes.io/os: linux
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"
+  containerPorts:
+    metricsPort: 8080
+    webhooksPort: 8444
+    readinessProbePort: 8443

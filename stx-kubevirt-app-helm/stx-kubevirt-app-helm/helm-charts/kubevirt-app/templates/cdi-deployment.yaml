@@ -11,7 +11,7 @@
 # limitations under the License.
 
 #
-# Copyright (c) 2022 Wind River Systems, Inc.
+# Copyright (c) 2023 Wind River Systems, Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -26,7 +26,7 @@ metadata:
   name: cdi-operator
   namespace: cdi
 spec:
-  replicas: 1
+  replicas: {{ .Values.cdi.replicas }}
   selector:
     matchLabels:
       name: cdi-operator
@@ -44,42 +44,44 @@ spec:
         - name: DEPLOY_CLUSTER_RESOURCES
           value: "true"
         - name: OPERATOR_VERSION
-          value: v1.54.0
+          value: {{ .Values.cdi.cdiVersion }}
         - name: CONTROLLER_IMAGE
-          value: {{ .Values.images.tags.cdiControlerImage }}
+          value: {{ .Values.cdi.images.tags.cdiControlerImage }}
         - name: IMPORTER_IMAGE
-          value: {{ .Values.images.tags.cdiImporterImage }}
+          value: {{ .Values.cdi.images.tags.cdiImporterImage }}
         - name: CLONER_IMAGE
-          value: {{ .Values.images.tags.cdiClonerImage }}
+          value: {{ .Values.cdi.images.tags.cdiClonerImage }}
         - name: APISERVER_IMAGE
-          value: {{ .Values.images.tags.cdiApiServerImage }}
+          value: {{ .Values.cdi.images.tags.cdiApiServerImage }}
         - name: UPLOAD_SERVER_IMAGE
-          value: {{ .Values.images.tags.cdiUploadServerImage }}
+          value: {{ .Values.cdi.images.tags.cdiUploadServerImage }}
         - name: UPLOAD_PROXY_IMAGE
-          value: {{ .Values.images.tags.cdiUploadProxyImage }}
+          value: {{ .Values.cdi.images.tags.cdiUploadProxyImage }}
         - name: VERBOSITY
           value: "1"
         - name: PULL_POLICY
           value: IfNotPresent
         - name: MONITORING_NAMESPACE
-        image: {{ .Values.images.tags.cdiOperatorImage }}
+        image: {{ .Values.cdi.images.tags.cdiOperatorImage }}
         imagePullPolicy: IfNotPresent
         name: cdi-operator
         ports:
-        - containerPort: {{ .Values.containerPorts.cdiMetricsPort }}
+        - containerPort: {{ .Values.cdi.containerPorts.metricsPort }}
           name: metrics
           protocol: TCP
         resources:
           requests:
-            memory: {{ .Values.resources.requests.memory }}
+            memory: {{ .Values.cdi.resources.requests.memory }}
+      imagePullSecrets:
+        - name: {{ .Values.cdi.imagePullSecrets }}
+{{- if .Values.cdi.nodeSelector }}
+      nodeSelector:
+{{ .Values.cdi.nodeSelector | toYaml | trim | indent 8 }}
+{{- end }}
       securityContext:
         runAsNonRoot: true
       serviceAccountName: cdi-operator
-{{- with .Values.tolerations }}
+{{- with .Values.cdi.tolerations }}
       tolerations:
 {{ toYaml . | indent 6 }}
-{{- end }}
-{{- if .Values.nodeSelector }}
-      nodeSelector:
-{{ .Values.nodeSelector | toYaml | trim | indent 8 }}
 {{- end }}

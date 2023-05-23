@@ -33,3 +33,17 @@ subjects:
 - kind: ServiceAccount
   name: cdi-operator
   namespace: cdi
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cdi-registry-rolebinding
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubevirt-registry-cr
+subjects:
+- kind: ServiceAccount
+  name: cdi-operator
+  namespace: cdi
