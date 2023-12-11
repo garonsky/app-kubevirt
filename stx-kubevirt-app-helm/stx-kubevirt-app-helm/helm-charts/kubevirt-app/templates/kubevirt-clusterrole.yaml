@@ -2,16 +2,15 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http:#www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 #
-# Copyright (c) 2023 Wind River Systems, Inc.
+# Copyright (c) 2024 Wind River Systems, Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -20,7 +19,49 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
-    kubevirt.io: ""
+    kubevirt.io: ''
+  name: kubevirt-registry-cr
+  namespace: kube-system
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    operator.kubevirt.io: ''
+    rbac.authorization.k8s.io/aggregate-to-admin: 'true'
+  name: kubevirt.io:operator
+rules:
+- apiGroups:
+  - kubevirt.io
+  resources:
+  - kubevirts
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+  - deletecollection
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    kubevirt.io: ''
   name: kubevirt-operator
 rules:
 - apiGroups:
@@ -35,7 +76,7 @@ rules:
   - update
   - patch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - serviceaccounts
   - services
@@ -50,7 +91,7 @@ rules:
   - delete
   - patch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - configmaps
   verbs:
@@ -186,7 +227,7 @@ rules:
   - update
   - patch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - namespaces
   verbs:
@@ -195,23 +236,7 @@ rules:
   - watch
   - patch
 - apiGroups:
-  - flavor.kubevirt.io
-  resources:
-  - virtualmachineflavors
-  - virtualmachineclusterflavors
-  - virtualmachinepreferences
-  - virtualmachineclusterpreferences
-  verbs:
-  - get
-  - delete
-  - create
-  - update
-  - patch
-  - list
-  - watch
-  - deletecollection
-- apiGroups:
-  - ""
+  - ''
   resources:
   - pods
   verbs:
@@ -231,7 +256,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - ""
+  - ''
   resources:
   - persistentvolumeclaims
   verbs:
@@ -260,7 +285,7 @@ rules:
   - watch
   - list
 - apiGroups:
-  - ""
+  - ''
   resources:
   - configmaps
   verbs:
@@ -268,7 +293,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - limitranges
   verbs:
@@ -310,6 +335,14 @@ rules:
   - list
   - watch
 - apiGroups:
+  - ''
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - instancetype.kubevirt.io
   resources:
   - virtualmachineinstancetypes
@@ -337,7 +370,7 @@ rules:
   - list
   - get
 - apiGroups:
-  - ""
+  - ''
   resources:
   - configmaps
   verbs:
@@ -345,7 +378,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - namespaces
   verbs:
@@ -365,7 +398,7 @@ rules:
   - create
   - patch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - pods
   - configmaps
@@ -380,7 +413,7 @@ rules:
   - create
   - patch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - events
   verbs:
@@ -388,31 +421,31 @@ rules:
   - create
   - patch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - secrets
   verbs:
   - create
 - apiGroups:
-  - ""
+  - ''
   resources:
   - pods/finalizers
   verbs:
   - update
 - apiGroups:
-  - ""
+  - ''
   resources:
   - pods/eviction
   verbs:
   - create
 - apiGroups:
-  - ""
+  - ''
   resources:
   - pods/status
   verbs:
   - patch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - nodes
   verbs:
@@ -439,7 +472,7 @@ rules:
   - get
   - update
 - apiGroups:
-  - ""
+  - ''
   resources:
   - persistentvolumeclaims
   verbs:
@@ -491,6 +524,8 @@ rules:
   - virtualmachineinstances/freeze
   - virtualmachineinstances/unfreeze
   - virtualmachineinstances/softreboot
+  - virtualmachineinstances/sev/setupsession
+  - virtualmachineinstances/sev/injectlaunchsecret
   verbs:
   - update
 - apiGroups:
@@ -505,8 +540,6 @@ rules:
   - network-attachment-definitions
   verbs:
   - get
-  - list
-  - watch
 - apiGroups:
   - apiextensions.k8s.io
   resources:
@@ -581,11 +614,18 @@ rules:
   - patch
   - delete
 - apiGroups:
-  - ""
+  - ''
   resources:
   - namespaces
   verbs:
   - get
+- apiGroups:
+  - ''
+  resources:
+  - resourcequotas
+  verbs:
+  - list
+  - watch
 - apiGroups:
   - route.openshift.io
   resources:
@@ -595,7 +635,7 @@ rules:
   - get
   - watch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - secrets
   verbs:
@@ -611,6 +651,18 @@ rules:
   - get
   - watch
 - apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - delete
+  - update
+  - create
+  - patch
+- apiGroups:
   - kubevirt.io
   resources:
   - virtualmachineinstances
@@ -619,7 +671,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - nodes
   verbs:
@@ -628,7 +680,7 @@ rules:
   - watch
   - get
 - apiGroups:
-  - ""
+  - ''
   resources:
   - configmaps
   verbs:
@@ -636,7 +688,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - events
   verbs:
@@ -667,7 +719,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - ""
+  - ''
   resources:
   - configmaps
   verbs:
@@ -690,7 +742,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - ""
+  - ''
   resourceNames:
   - kubevirt-export-ca
   resources:
@@ -717,6 +769,8 @@ rules:
   - virtualmachineinstances/guestosinfo
   - virtualmachineinstances/filesystemlist
   - virtualmachineinstances/userlist
+  - virtualmachineinstances/sev/fetchcertchain
+  - virtualmachineinstances/sev/querylaunchmeasurement
   verbs:
   - get
 - apiGroups:
@@ -729,6 +783,8 @@ rules:
   - virtualmachineinstances/freeze
   - virtualmachineinstances/unfreeze
   - virtualmachineinstances/softreboot
+  - virtualmachineinstances/sev/setupsession
+  - virtualmachineinstances/sev/injectlaunchsecret
   verbs:
   - update
 - apiGroups:
@@ -789,6 +845,32 @@ rules:
   - watch
   - deletecollection
 - apiGroups:
+  - export.kubevirt.io
+  resources:
+  - virtualmachineexports
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+  - deletecollection
+- apiGroups:
+  - clone.kubevirt.io
+  resources:
+  - virtualmachineclones
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+  - deletecollection
+- apiGroups:
   - instancetype.kubevirt.io
   resources:
   - virtualmachineinstancetypes
@@ -831,9 +913,12 @@ rules:
   - virtualmachineinstances/console
   - virtualmachineinstances/vnc
   - virtualmachineinstances/vnc/screenshot
+  - virtualmachineinstances/portforward
   - virtualmachineinstances/guestosinfo
   - virtualmachineinstances/filesystemlist
   - virtualmachineinstances/userlist
+  - virtualmachineinstances/sev/fetchcertchain
+  - virtualmachineinstances/sev/querylaunchmeasurement
   verbs:
   - get
 - apiGroups:
@@ -846,13 +931,15 @@ rules:
   - virtualmachineinstances/freeze
   - virtualmachineinstances/unfreeze
   - virtualmachineinstances/softreboot
-  - virtualmachineinstances/portforward
+  - virtualmachineinstances/sev/setupsession
+  - virtualmachineinstances/sev/injectlaunchsecret
   verbs:
   - update
 - apiGroups:
   - subresources.kubevirt.io
   resources:
   - virtualmachines/expand-spec
+  - virtualmachines/portforward
   verbs:
   - get
 - apiGroups:
@@ -895,6 +982,30 @@ rules:
   - virtualmachinesnapshots
   - virtualmachinesnapshotcontents
   - virtualmachinerestores
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+- apiGroups:
+  - export.kubevirt.io
+  resources:
+  - virtualmachineexports
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+- apiGroups:
+  - clone.kubevirt.io
+  resources:
+  - virtualmachineclones
   verbs:
   - get
   - delete
@@ -952,6 +1063,8 @@ rules:
   - virtualmachineinstances/guestosinfo
   - virtualmachineinstances/filesystemlist
   - virtualmachineinstances/userlist
+  - virtualmachineinstances/sev/fetchcertchain
+  - virtualmachineinstances/sev/querylaunchmeasurement
   verbs:
   - get
 - apiGroups:
@@ -978,6 +1091,22 @@ rules:
   - virtualmachinesnapshots
   - virtualmachinesnapshotcontents
   - virtualmachinerestores
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - export.kubevirt.io
+  resources:
+  - virtualmachineexports
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - clone.kubevirt.io
+  resources:
+  - virtualmachineclones
   verbs:
   - get
   - list
@@ -1010,6 +1139,15 @@ rules:
   - list
   - watch
 - apiGroups:
+  - instancetype.kubevirt.io
+  resources:
+  - virtualmachineclusterinstancetypes
+  - virtualmachineclusterpreferences
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - authentication.k8s.io
   resources:
   - tokenreviews
@@ -1021,45 +1159,3 @@ rules:
   - subjectaccessreviews
   verbs:
   - create
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: kubevirt.io:operator
-  labels:
-    operator.kubevirt.io: ""
-    rbac.authorization.k8s.io/aggregate-to-admin: "true"
-rules:
-  - apiGroups:
-      - kubevirt.io
-    resources:
-      - kubevirts
-    verbs:
-      - get
-      - delete
-      - create
-      - update
-      - patch
-      - list
-      - watch
-      - deletecollection
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    kubevirt.io: ""
-  name: kubevirt-registry-cr
-  namespace: kube-system
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - create
-  - get
-  - list
-  - watch
-  - patch
-  - delete

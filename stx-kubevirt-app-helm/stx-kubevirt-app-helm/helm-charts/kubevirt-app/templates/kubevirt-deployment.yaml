@@ -2,16 +2,15 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http:#www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 #
-# Copyright (c) 2023 Wind River Systems, Inc.
+# Copyright (c) 2024 Wind River Systems, Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -35,7 +34,7 @@ spec:
       labels:
         kubevirt.io: virt-operator
         name: virt-operator
-        prometheus.kubevirt.io: "true"
+        prometheus.kubevirt.io: 'true'
       name: virt-operator
     spec:
       affinity:
@@ -53,9 +52,9 @@ spec:
       containers:
       - args:
         - --port
-        - "8443"
+        - '8443'
         - -v
-        - "2"
+        - '2'
         command:
         - virt-operator
         env:
@@ -66,7 +65,7 @@ spec:
             fieldRef:
               fieldPath: metadata.annotations['olm.targetNamespaces']
         - name: KUBEVIRT_VERSION
-          value: {{ .Values.kubevirt.kubeVirtVersion }}
+          value: v1.1.0
         image: {{ .Values.kubevirt.images.tags.virtOperatorImage }}
         imagePullPolicy: IfNotPresent
         name: virt-operator
@@ -80,7 +79,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /metrics
-            port: {{ .Values.kubevirt.containerPorts.readinessProbePort }}
+            port: {{ .Values.kubevirt.readinessProbePort }}
             scheme: HTTPS
           initialDelaySeconds: 5
           timeoutSeconds: 10
@@ -100,30 +99,39 @@ spec:
           readOnly: true
         - mountPath: /profile-data
           name: profile-data
-      initContainers:
-        - name: virtctl-init-container
-          image: {{ .Values.kubevirt.images.tags.virtCtlImage }}
-          imagePullPolicy: IfNotPresent
-          volumeMounts:
-            - name: controller-dir
-              mountPath: /var/opt/
-          command: ['sh', '-c', "mkdir -p /var/opt/kubevirt/; mv /virtctl-v* /var/opt/kubevirt; chmod 755 /var/opt/kubevirt; cp -s /var/opt/kubevirt/virtctl-v* /var/opt/kubevirt/virtctl"]
       imagePullSecrets:
-        - name: {{ .Values.kubevirt.imagePullSecrets }}
+      - name: {{ .Values.kubevirt.imagePullSecrets }}
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - rm -rf /var/opt/kubevirt/*;mkdir -p /var/opt/kubevirt/; mv /virtctl-v1.1.0-linux-amd64
+          /var/opt/kubevirt/; chmod 755 /var/opt/kubevirt/; cp -sf /var/opt/kubevirt/virtctl-v1.1.0-linux-amd64
+          /var/opt/kubevirt/virtctl
+        image: {{ .Values.kubevirt.images.tags.virtCtlImage }}
+        imagePullPolicy: IfNotPresent
+        name: virtctl-init-container
+        volumeMounts:
+        - mountPath: /var/opt/
+          name: controller-dir
+      nodeSelector:
+        kubernetes.io/os: linux
+        node-role.kubernetes.io/control-plane: ''
       priorityClassName: kubevirt-cluster-critical
       securityContext:
         runAsNonRoot: false
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: kubevirt-operator
-{{- with .Values.kubevirt.tolerations }}
       tolerations:
-{{ toYaml . | indent 6 }}
-{{- end }}
-{{- if .Values.kubevirt.nodeSelector }}
-      nodeSelector:
-{{ .Values.kubevirt.nodeSelector | toYaml | trim | indent 8 }}
-{{- end }}
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
       volumes:
       - name: kubevirt-operator-certs
         secret:
@@ -131,7 +139,7 @@ spec:
           secretName: kubevirt-operator-certs
       - emptyDir: {}
         name: profile-data
-      - name: controller-dir
-        hostPath:
+      - hostPath:
           path: /var/opt
           type: Directory
+        name: controller-dir

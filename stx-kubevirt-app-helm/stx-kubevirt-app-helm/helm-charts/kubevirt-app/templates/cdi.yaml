@@ -2,16 +2,15 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http:#www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 #
-# Copyright (c) 2022 Wind River Systems, Inc.
+# Copyright (c) 2024 Wind River Systems, Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -29,17 +28,18 @@ spec:
       duration: {{ .Values.cdi.certificateRotate.server.duration }}
       renewBefore: {{ .Values.cdi.certificateRotate.server.renewBefore }}
   config:
+    featureGates: {{ .Values.cdi.featureGates }}
     imagePullSecrets:
     - name: {{ .Values.cdi.imagePullSecrets }}
-    featureGates: {{ .Values.cdi.featureGates }}
   imagePullPolicy: IfNotPresent
   infra:
+    nodeSelector:
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/control-plane: ''
     tolerations:
     - key: CriticalAddonsOnly
       operator: Exists
   workload:
-    {{- if .Values.cdi.nodeSelector }}
     nodeSelector:
-      {{- .Values.cdi.nodeSelector | toYaml | trim | nindent 6 }}
-    {{- end }}
-
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/control-plane: ''
