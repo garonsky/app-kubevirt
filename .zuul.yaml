@@ -8,12 +8,14 @@
         - k8sapp-kubevirt-tox-py39
         - k8sapp-kubevirt-tox-flake8
         - k8sapp-kubevirt-tox-pylint
+        - k8sapp-kubevirt-tox-metadata
     gate:
       jobs:
         - openstack-tox-linters
         - k8sapp-kubevirt-tox-py39
         - k8sapp-kubevirt-tox-flake8
         - k8sapp-kubevirt-tox-pylint
+        - k8sapp-kubevirt-tox-metadata
 
 - job:
     name: k8sapp-kubevirt-tox-py39
@@ -45,6 +47,25 @@
     vars:
         tox_envlist: flake8
         tox_extra_args: -c python3-k8sapp-kubevirt/k8sapp_kubevirt/tox.ini
+
+- job:
+    name: k8sapp-kubevirt-tox-metadata
+    parent: tox
+    description: |
+      Run metadata test for k8sapp_kubevirt
+    required-projects:
+      - starlingx/config
+      - starlingx/fault
+      - starlingx/root
+      - starlingx/update
+      - starlingx/utilities
+    nodeset: debian-bullseye
+    files:
+      - python3-k8sapp-kubevirt/*
+    vars:
+      tox_envlist: metadata
+      tox_extra_args: -c python3-k8sapp-kubevirt/k8sapp_kubevirt/tox.ini
+      tox_constraints_file: '{{ ansible_user_dir }}/src/opendev.org/starlingx/root/build-tools/requirements/debian/upper-constraints.txt'
 
 - job:
     name: k8sapp-kubevirt-tox-pylint
