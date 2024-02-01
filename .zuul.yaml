@@ -60,8 +60,6 @@
       - starlingx/update
       - starlingx/utilities
     nodeset: debian-bullseye
-    files:
-      - python3-k8sapp-kubevirt/*
     vars:
       tox_envlist: metadata
       tox_extra_args: -c python3-k8sapp-kubevirt/k8sapp_kubevirt/tox.ini
