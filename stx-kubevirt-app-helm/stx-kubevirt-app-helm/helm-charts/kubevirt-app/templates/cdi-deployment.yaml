@@ -2,16 +2,15 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http:#www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 #
-# Copyright (c) 2023 Wind River Systems, Inc.
+# Copyright (c) 2024 Wind River Systems, Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -21,8 +20,8 @@ kind: Deployment
 metadata:
   labels:
     name: cdi-operator
-    operator.cdi.kubevirt.io: ""
-    prometheus.cdi.kubevirt.io: "true"
+    operator.cdi.kubevirt.io: ''
+    prometheus.cdi.kubevirt.io: 'true'
   name: cdi-operator
   namespace: cdi
 spec:
@@ -30,21 +29,21 @@ spec:
   selector:
     matchLabels:
       name: cdi-operator
-      operator.cdi.kubevirt.io: ""
+      operator.cdi.kubevirt.io: ''
   strategy: {}
   template:
     metadata:
       labels:
         name: cdi-operator
-        operator.cdi.kubevirt.io: ""
-        prometheus.cdi.kubevirt.io: "true"
+        operator.cdi.kubevirt.io: ''
+        prometheus.cdi.kubevirt.io: 'true'
     spec:
       containers:
       - env:
         - name: DEPLOY_CLUSTER_RESOURCES
-          value: "true"
+          value: 'true'
         - name: OPERATOR_VERSION
-          value: {{ .Values.cdi.cdiVersion }}
+          value: v1.58.0
         - name: CONTROLLER_IMAGE
           value: {{ .Values.cdi.images.tags.cdiControlerImage }}
         - name: IMPORTER_IMAGE
@@ -58,7 +57,7 @@ spec:
         - name: UPLOAD_PROXY_IMAGE
           value: {{ .Values.cdi.images.tags.cdiUploadProxyImage }}
         - name: VERBOSITY
-          value: "1"
+          value: '1'
         - name: PULL_POLICY
           value: IfNotPresent
         - name: MONITORING_NAMESPACE
@@ -72,16 +71,28 @@ spec:
         resources:
           requests:
             memory: {{ .Values.cdi.resources.requests.memory }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
       imagePullSecrets:
-        - name: {{ .Values.cdi.imagePullSecrets }}
-{{- if .Values.cdi.nodeSelector }}
+      - name: {{ .Values.cdi.imagePullSecrets }}
       nodeSelector:
-{{ .Values.cdi.nodeSelector | toYaml | trim | indent 8 }}
-{{- end }}
+        kubernetes.io/os: linux
+        node-role.kubernetes.io/control-plane: ''
       securityContext:
         runAsNonRoot: true
       serviceAccountName: cdi-operator
-{{- with .Values.cdi.tolerations }}
       tolerations:
-{{ toYaml . | indent 6 }}
-{{- end }}
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
